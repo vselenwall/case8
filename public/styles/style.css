@@ -6,23 +6,16 @@
 
 ul {
     margin: 2rem;
-    padding: 0;
     list-style: none;
     background-color: deeppink;
-    padding: 2rem;
-    margin: 2rem;
-    display: grid;
-    grid-template-rows: 1fr 1fr;
 }
 
 li {
-    background-color: aqua;
+    display: grid;
+    grid-template-columns: 1fr 5fr 1fr;
 }
 
 li p {
-    background-color: #fff;
-	padding: 1.125em 1.5em;
-    margin: 1rem;
-	border-radius: 1rem;
-    box-shadow:	0 0.125rem 0.5rem rgba(0, 0, 0, .3), 0 0.0625rem 0.125rem rgba(0, 0, 0, .2);
+    background-color: bisque;
+ 
 }
