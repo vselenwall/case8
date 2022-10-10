@@ -1,4 +1,3 @@
-// DOM elements
 const inputText = document.getElementById("messageField");
 const setName = document.querySelector("#setName");
 
@@ -6,7 +5,7 @@ const setCharacter = document.getElementById("poo");
 
 const setFeeling = document.querySelector("#setFeeling");
 
-// variable current user | name
+// variable current un
 let nickname;
 
 // use webSocket >>> make sure server uses same ws port
@@ -16,7 +15,7 @@ const websocket = new WebSocket("ws://localhost:80");
 
 /* Event listeners */
 
-//Connection opened
+// Open connection
 websocket.addEventListener("open", (event) => {
     console.log("Connected to server");
     document.getElementById("status").textContent = "Server is running.";
@@ -57,7 +56,7 @@ websocket.addEventListener("open", (event) => {
 //     console.log("Server down... ", event);
 //     document.getElementById("status").textContent = "Sorry, server is down.";
 
-    // listen to message from client | server
+    // listen to message from client, server
     websocket.addEventListener("message", (event) => {
         console.log(event.data);
 
@@ -83,7 +82,7 @@ websocket.addEventListener("open", (event) => {
 
 
     inputText.addEventListener("keydown", (event) => {
-        // press Enter, make sure at least one character
+        // press Enter and need to have at least one character
         if (event.key === "Enter" && inputText.value.length > 0) {
             // chat message obj
             let objMessage = {
@@ -134,7 +133,7 @@ websocket.addEventListener("open", (event) => {
         // use template - cloneNode to get a document fragment
         let template = document.getElementById("message").cloneNode(true);
 
-        // access content
+        // reach content
         let newMsg = template.content;
 
         // change content
@@ -142,14 +141,14 @@ websocket.addEventListener("open", (event) => {
         newMsg.querySelector("p").textContent = obj.msg;
         // newMsg.querySelector("i").textContent = obj.feeling;
 
-        // new date object
+        // new date
         let objDate = new Date();
 
-        // visual time, leading zero
+        // visual time, get time
         newMsg.querySelector("time").textContent = 
         objDate.getHours() + ":" + objDate.getMinutes();
 
-        // set datetime attribute - see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time
+        // set datetime
         newMsg
         .querySelector("time")
         .setAttribute("datetime", objDate.toISOString());
@@ -158,3 +157,75 @@ websocket.addEventListener("open", (event) => {
         document.getElementById("chatConversation").append(newMsg);
     }
 
+    /* CANVAS FUNCTIONS */
+
+    function init(e) {
+        // get canvas
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d");
+      
+        // make dots
+        let isPainting = false;
+        const initPaint = (e) => {
+          isPainting = true;
+          paint(e); 
+        };
+      
+        const finishPaint = () => {
+          isPainting = false;
+        };
+      
+        const paint = (e) => {
+
+            if (!isPainting) return;
+            const args = {x: e.clientX, y: e.clientY, radius:10, startAngle:0, endAngle: 2 * Math.PI};
+            websocket.send(JSON.stringify({ type: "paint", payload: args }));
+          
+            // draw circles
+            ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI); 
+           
+            ctx.fill();
+
+            ctx.beginPath();
+          };
+      
+
+    
+        const handleSocketOpen = (e) => {
+            console.log('Socket has been opened');
+          };
+         
+          // CHECK THIS ONE AGAIN
+          const handleSocketMessage = (e) => {
+            const message = JSON.parse(e.data);
+            console.log(`Message incoming: ${message}`);
+            switch (message.type) {
+              case "paint":
+                const args = message.payload;
+                // paint when told by server
+                paintDot(ctx, args); 
+                break;
+              default:
+                console.log("default case...");
+            }
+          }
+      
+        // con events w func
+        websocket.onopen = handleSocketOpen;
+        websocket.onmessage = handleSocketMessage;
+        canvas.onmousedown = initPaint
+        canvas.onmousemove = paint
+        canvas.onmouseup = finishPaint
+
+      }
+
+      function paintDot(ctx, args) {
+        ctx.arc(args.x, args.y, args.radius, args.startAngle, args.endAngle);
+        ctx.fill();
+        ctx.beginPath();
+
+
+        console.log(ctx);
+      }
+      
+      window.onload = init;

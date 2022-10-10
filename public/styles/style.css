@@ -4,6 +4,9 @@
     box-sizing: border-box;
 }
 
+
+/* INDEX */
+
 ul {
     margin: 2rem;
     list-style: none;
@@ -19,3 +22,9 @@ li p {
     background-color: bisque;
  
 }
+
+/* INDEX - CANVAS */
+
+canvas {
+    border: 5px solid black;
+  }
